@@ -4,7 +4,6 @@ import { v1, CommunicationMethodV1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 
 const localExecuter = new Executer()
-// TODO - trigger release - remove me
 const BROWSER_ENABLED_COMM_METHODS = [CommunicationMethodV1.HTTP]
 
 export const executeCommunication = (
