@@ -107,11 +107,16 @@
       ]
     }
   },
+  "peerDependencies": {
+    "@ge-fnm/action-object": "3.0.0-next.1",
+    "axios": "^0.19.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@types/jest": "^25.1.1",
     "@types/node": "^13.7.0",
+    "axios": "^0.19.2",
     "commitizen": "^4.0.3",
     "coveralls": "^3.0.9",
     "cross-env": "^7.0.0",
@@ -135,11 +140,8 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@ge-fnm/action-object": "^2.0.1",
-    "@ge-fnm/perform-action-module": "^1.0.0",
     "@types/browser-or-node": "^1.2.0",
-    "axios": "^0.19.2",
     "browser-or-node": "^1.2.1",
-    "immutable": "^4.0.0-rc.12"
+    "@ge-fnm/perform-action-module": "^1.0.1-next.2"
   }
 }
