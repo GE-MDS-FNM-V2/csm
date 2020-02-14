@@ -21,7 +21,10 @@ const objJson: ActionObjectInformationV1 = {
   },
   modifyingValue: 'test',
   path: ['hello', 'world'],
-  response: undefined,
+  response: {
+    data: null,
+    error: null
+  },
   uri: 'http://localhost:8000'
 }
 
