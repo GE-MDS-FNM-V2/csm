@@ -142,6 +142,6 @@
   "dependencies": {
     "@types/browser-or-node": "^1.2.0",
     "browser-or-node": "^1.2.1",
-    "@ge-fnm/perform-action-module": "^1.0.1-next.2"
+    "@ge-fnm/perform-action-module": "1.0.1-next.3"
   }
 }

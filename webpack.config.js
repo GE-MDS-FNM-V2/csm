@@ -21,8 +21,18 @@ const createConfig = ({ libraryTarget, target }) => {
       extensions: ['.tsx', '.ts', '.js']
     },
     externals: {
-      '@ge-fnm/action-object': '@ge-fnm/action-object',
-      axios: 'axios'
+      '@ge-fnm/action-object': {
+        commonjs2: '@ge-fnm/action-object',
+        commonjs: '@ge-fnm/action-object',
+        amd: '@ge-fnm/action-object',
+        root: '@ge-fnm/action-object' // indicates global variable
+      },
+      axios: {
+        commonjs2: 'axios',
+        commonjs: 'axios',
+        amd: 'axios',
+        root: 'axios' // indicates global variable
+      }
     },
     output: {
       filename: `bundle-${target}.js`,

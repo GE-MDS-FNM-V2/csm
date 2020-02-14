@@ -293,10 +293,10 @@
   resolved "https://registry.yarnpkg.com/@ge-fnm/action-object/-/action-object-2.0.1.tgz#3b62ef98087b95652fa509748147557860e56b34"
   integrity sha512-8TvOKnDxo/eouC/rpluMt+Sqx63GiOqHJSmADLiTeBHWmNsKVQ2ltHlkvuqnI7X1Qdlm1QXVHgc4466bsCC1Ag==
 
-"@ge-fnm/perform-action-module@^1.0.1-next.2":
-  version "1.0.1-next.2"
-  resolved "https://registry.yarnpkg.com/@ge-fnm/perform-action-module/-/perform-action-module-1.0.1-next.2.tgz#8e7df76d7aaf0a2a709d5fb38943a4a8804a04d5"
-  integrity sha512-is2vW1eC/MmE1gls2I4s7QjRj+E1kwPi5Di8tU5Yp+wBdQ8sasnsFW0W1cFuovov6XfokdoSyOJMKdNMA1eBjQ==
+"@ge-fnm/perform-action-module@1.0.1-next.3":
+  version "1.0.1-next.3"
+  resolved "https://registry.yarnpkg.com/@ge-fnm/perform-action-module/-/perform-action-module-1.0.1-next.3.tgz#0e43eb122d7f930f21c1989b4ad84e8ef19efe38"
+  integrity sha512-PpMkh1mUzDlZc1sj0v/KuCqH23icx/N/hGSgWLoSImtIjCUbAvK1OCRuiJsHhgmLaHn4J5v1f6OIhURBMBy06A==
   dependencies:
     "@ge-fnm/action-object" "^2.0.1"
     browser-or-node "^1.2.1"
