@@ -108,7 +108,7 @@
     }
   },
   "peerDependencies": {
-    "@ge-fnm/action-object": "3.0.0-next.2",
+    "@ge-fnm/action-object": "^4.0.0-next.1",
     "axios": "^0.19.2"
   },
   "devDependencies": {
