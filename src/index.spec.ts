@@ -5,7 +5,6 @@ import {
   ProtocolV1,
   ActionObjectInformationV1
 } from '@ge-fnm/action-object'
-// import { NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
 
 const REMOTE_PAM_SUCCESS_STRING = 'SUCCESS CALLED REMOTE PAM'
 const LOCAL_PAM_SUCCESS_STRING = 'SUCCESS CALLED LOCAL PAM'
