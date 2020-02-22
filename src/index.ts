@@ -1,10 +1,10 @@
 import { isNode } from 'browser-or-node'
 import { Executer } from '@ge-fnm/perform-action-module'
-import { v1, CommunicationMethodV1 } from '@ge-fnm/action-object'
+import { v1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
+import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
 
 const localExecuter = new Executer()
-const BROWSER_ENABLED_COMM_METHODS = [CommunicationMethodV1.HTTP]
 
 export const executeCommunication = (
   serializedActionObject: string,
@@ -31,11 +31,7 @@ export const executeCommunication = (
             reject(err)
           })
       } else {
-        reject(
-          new Error(
-            'BROWSER ENVIRONMENT CANNOT EXECUTE THIS ACTION, NEEDS A FORWARDING ADDRESS FOR A REMOTE EXECUTOR'
-          )
-        )
+        reject(new Error(NEEDS_FORWARDING_ADDRESS_ERROR))
       }
     } else {
       // The current environment should support a local action
