@@ -1,10 +1,10 @@
 import { isNode } from 'browser-or-node'
-import { Executer } from '@ge-fnm/perform-action-module'
+import { LocalExecuter } from './pam-singleton'
 import { v1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
 
-const localExecuter = new Executer()
+const localExecuter = LocalExecuter.getExecuter()
 
 export const executeCommunication = (
   serializedActionObject: string,
