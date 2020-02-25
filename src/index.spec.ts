@@ -10,6 +10,8 @@ const REMOTE_PAM_SUCCESS_STRING = 'SUCCESS CALLED REMOTE PAM'
 const LOCAL_PAM_SUCCESS_STRING = 'SUCCESS CALLED LOCAL PAM'
 const REMOTE_PAM_FAILURE_STRING = 'FAILURE CALLED REMOTE PAM'
 const LOCAL_PAM_FAILURE_STRING = 'FAILURE CALLED LOCAL PAM'
+const NEEDS_FORWARDING_ADDRESS_ERROR_MOCK =
+  'Failure message in case of browser with no forwarding address'
 
 // BUILDING THE OPTIONS FOR CREATING AN ACTION OBJECT
 const objJson: ActionObjectInformationV1 = {
@@ -42,7 +44,6 @@ describe('Communication Selector Test', () => {
           executeRemoteAction: () => Promise.resolve(REMOTE_PAM_SUCCESS_STRING)
         }
       })
-
       jest.mock('@ge-fnm/perform-action-module', () => {
         return {
           Executer: jest.fn().mockImplementation(() => {
@@ -53,6 +54,12 @@ describe('Communication Selector Test', () => {
       jest.mock('browser-or-node', () => {
         return {
           isNode: false
+        }
+      })
+      jest.mock('./constants', () => {
+        return {
+          BROWSER_ENABLED_COMM_METHODS: [CommunicationMethodV1.HTTP],
+          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK
         }
       })
 
@@ -88,7 +95,6 @@ describe('Communication Selector Test', () => {
           executeRemoteAction: () => Promise.reject(REMOTE_PAM_FAILURE_STRING)
         }
       })
-
       jest.mock('@ge-fnm/perform-action-module', () => {
         return {
           Executer: jest.fn().mockImplementation(() => {
@@ -99,6 +105,12 @@ describe('Communication Selector Test', () => {
       jest.mock('browser-or-node', () => {
         return {
           isNode: false
+        }
+      })
+      jest.mock('./constants', () => {
+        return {
+          BROWSER_ENABLED_COMM_METHODS: [CommunicationMethodV1.HTTP],
+          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK
         }
       })
 
@@ -118,9 +130,7 @@ describe('Communication Selector Test', () => {
     })
     it('Unsupported protocol rejects', () => {
       return expect(executeCommunication(serialSerializedAction)).rejects.toEqual(
-        new Error(
-          'BROWSER ENVIRONMENT CANNOT EXECUTE THIS ACTION, NEEDS A FORWARDING ADDRESS FOR A REMOTE EXECUTOR'
-        )
+        new Error(NEEDS_FORWARDING_ADDRESS_ERROR_MOCK)
       )
     })
     afterAll(() => {
@@ -143,10 +153,15 @@ describe('Communication Selector Test', () => {
           })
         }
       })
-
       jest.mock('./remote-csm', () => {
         return {
           executeRemoteAction: () => Promise.resolve(REMOTE_PAM_SUCCESS_STRING)
+        }
+      })
+      jest.mock('./constants', () => {
+        return {
+          BROWSER_ENABLED_COMM_METHODS: [CommunicationMethodV1.HTTP],
+          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK
         }
       })
 
