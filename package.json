@@ -110,7 +110,8 @@
   },
   "peerDependencies": {
     "@ge-fnm/action-object": "^4.0.0",
-    "axios": "^0.19.2"
+    "axios": "^0.19.2",
+    "@ge-fnm/perform-action-module": "^1.2.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
@@ -142,7 +143,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@ge-fnm/perform-action-module": "^1.2.0",
+    "@ge-fnm/perform-action-module": "^1.2.1",
     "@types/browser-or-node": "^1.2.0",
     "browser-or-node": "^1.2.1"
   }

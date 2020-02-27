@@ -293,10 +293,10 @@
   resolved "https://registry.yarnpkg.com/@ge-fnm/action-object/-/action-object-4.0.0.tgz#4a45b065b14ba450c24b2b1d279aced1fcdd6fa1"
   integrity sha512-F5ne6B3GFmhhSP23Tk7h2ko9uByJ9iz/YH/idjcPwGz7h5qY4mm46mQ6OQQ7kZF7hqdeqIjf1FLkHyQ7TIiU6w==
 
-"@ge-fnm/perform-action-module@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@ge-fnm/perform-action-module/-/perform-action-module-1.2.0.tgz#f596d4158bc1b78b7e0f96fe77b4433019c7ca50"
-  integrity sha512-T0U23Basgx6IByVxfQ3S4UN6r7Yn1c3ZXfaFCLgOQiwCP7gZMA6CI6RUfM66U48J2ftWZzXUXHKo0w21qjct4A==
+"@ge-fnm/perform-action-module@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@ge-fnm/perform-action-module/-/perform-action-module-1.2.1.tgz#3f2475c1cc14f5d182dc3f967371b6d6504cb68b"
+  integrity sha512-hElO43pvaJoGIzkodWtVSwALL/PEgbsfoLQ3WKkmLD31aP1Ymwz9JxAXRA47UJwG2nHLiVS6MbMQ3XtNHUdUfQ==
   dependencies:
     browser-or-node "^1.2.1"
     typescript-map "^0.0.7"

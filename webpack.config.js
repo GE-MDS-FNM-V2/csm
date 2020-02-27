@@ -27,6 +27,12 @@ const createConfig = ({ libraryTarget, target }) => {
         amd: '@ge-fnm/action-object',
         root: '@ge-fnm/action-object' // indicates global variable
       },
+      '@ge-fnm/perform-action-module': {
+        commonjs2: '@ge-fnm/perform-action-module',
+        commonjs: '@ge-fnm/perform-action-module',
+        amd: '@ge-fnm/perform-action-module',
+        root: '@ge-fnm/perform-action-module' // indicates global variable
+      },
       axios: {
         commonjs2: 'axios',
         commonjs: 'axios',
