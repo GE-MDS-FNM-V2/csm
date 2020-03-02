@@ -9,7 +9,7 @@ yarn add @ge-fnm/csm
 TODO: The rest of this documentation
 
 ### Documentation
-Documentation can be found here - https://ge-mds-fnm-v2.github.io/communication-selector-module/
+Documentation can be found here - https://ge-mds-fnm-v2.github.io/csm/
 
 ## I want to work on this project
 Please see [CONTRIBUTING.md](CONTRIBUTING.md)
