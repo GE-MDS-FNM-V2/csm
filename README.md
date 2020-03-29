@@ -11,6 +11,20 @@ TODO: The rest of this documentation
 ### Documentation
 Documentation can be found here - https://ge-mds-fnm-v2.github.io/csm/
 
+## Debugging
+We've added in optional logging to this module. You can enable it by setting the environment variable DEBUG:
+```sh
+DEBUG=ge-fnm:csm* yarn #to enable logging for only the csm module
+-or-
+DEBUG=ge-fnm:csm:pam-singleton yarn #to enable just logging for the singleton housing the PAM Executor
+-or-
+DEBUG=ge-fnm:csm:remote-csm yarn #to enable just logging for the remote CSM->CSM integration point
+-or-
+DEBUG=ge-fnm:* yarn # for all logging related to ge-fnm
+-or-
+DEBUG=* yarn # enable logging for all installed node_modules that look for the env var DEBUG - please note, this is a lot. You probably dont want this
+
+```
 ## I want to work on this project
 Please see [CONTRIBUTING.md](CONTRIBUTING.md)
 
