@@ -37,7 +37,8 @@ const serialSerializedAction = v1.create(objJson).serialize()
 describe('Communication Selector Test', () => {
   describe('In browser - local and remote resolve', () => {
     let executeCommunication: any
-    // Run before every single it() block within this describe block
+    // Run before every single it() block within this describe block. Using
+    // this as a means of manipulating mock responses from imported packages.
     beforeEach(() => {
       jest.mock('./remote-csm', () => {
         return {
@@ -88,7 +89,8 @@ describe('Communication Selector Test', () => {
   })
   describe('In browser - local and remote reject', () => {
     let executeCommunication: any
-    // Run before every single it() block within this describe block
+    // Run before every single it() block within this describe block. Using
+    // this as a means of manipulating mock responses from imported packages.
     beforeEach(() => {
       jest.mock('./remote-csm', () => {
         return {
@@ -139,7 +141,8 @@ describe('Communication Selector Test', () => {
   })
   describe('In Node', () => {
     let executeCommunication: any
-    // Run before every single it() block within this describe block
+    // Run before every single it() block within this describe block. Using
+    // this as a means of manipulating mock responses from imported packages.
     beforeEach(() => {
       jest.mock('browser-or-node', () => {
         return {

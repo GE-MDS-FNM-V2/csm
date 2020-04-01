@@ -1,13 +1,27 @@
 import debug from 'debug'
 import { isNode } from 'browser-or-node'
 import { LocalExecuter } from './pam-singleton'
-import { v1 } from '@ge-fnm/action-object'
+import { v1, CommunicationMethodV1, ActionObjec } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
 
 const log = debug('ge-fnm:csm')
 const localExecuter = LocalExecuter.getExecuter()
 
+/**
+ * This is the main interface for communicating with a GE radio via the
+ * perform-action-module, with reverse proxy capabilities.
+ *
+ * The main sequence events followed by this function are as follows:
+ * 1. Unpack an action object and determine what protocol should be used to
+ *    perform the action.
+ * 2. Determine if that protocol can be performed in the current runtime environment
+ *    a. If it can, perform the action with an instance of the perform-action-module
+ *       Executer class.
+ *    b. If it cannot, make a remote call to another CSM hosted at an address
+ *       (forwardingAddress) and environment where it can perform the action
+ * 3. Return the response object to the consumer of this module
+ */
 export const executeCommunication = (
   serializedActionObject: string,
   forwardingAddress?: string
@@ -34,8 +48,10 @@ export const executeCommunication = (
       return
     }
     let protocol = deserializedObj.information.commData.commMethod
-    // Check to see if current environment is unable to perform the communication
-    if (!isNode && !BROWSER_ENABLED_COMM_METHODS.includes(protocol)) {
+    // If the procol specified in the action object cannot be performed in the
+    // current runtime environment, a remote hosted CSM needs to be used to
+    // reach the radio
+    if (!protocolEnabledInCurrentEnvironment(protocol)) {
       log('Protocol,', protocol, ', is not supported by browser. Making remote execute call.')
       if (forwardingAddress) {
         executeRemoteAction(serializedActionObject, forwardingAddress)
@@ -45,7 +61,7 @@ export const executeCommunication = (
           })
           .catch(err => {
             log('Remote Execution responded with following error,', err)
-            reject(err)
+            resolve(err)
           })
       } else {
         log(
@@ -53,9 +69,11 @@ export const executeCommunication = (
         )
         reject(new Error(NEEDS_FORWARDING_ADDRESS_ERROR))
       }
-    } else {
+    }
+    // This block is only hit if the current environment supports
+    // communications with the radio
+    else {
       log('Executing Communication locally')
-      // The current environment should support a local action
       localExecuter
         .execute(serializedActionObject)
         .then(data => {
@@ -68,4 +86,17 @@ export const executeCommunication = (
         })
     }
   })
+}
+
+/**
+ * There are two scenarios where communications with the radio are enabled
+ * in the current runtime environment:
+ *
+ * 1. This CSM module is being run in a Node environment (all protocols are
+ *    enabled in Node)
+ * 2. Developers have determined that there are protocols that a browser can
+ *    safely communicate with a radio directly (ie, HTTP)
+ */
+const protocolEnabledInCurrentEnvironment = (protocol: CommunicationMethodV1): boolean => {
+  return isNode || BROWSER_ENABLED_COMM_METHODS.includes(protocol)
 }
