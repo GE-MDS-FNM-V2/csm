@@ -1,12 +1,37 @@
 # GE-FNM Communication Selector Module (@ge-fnm/csm)
 
 ## I would like to use the library in my app
+### Installation
 To get started with the repository in your project install it like this
-```
+```sh
 yarn add @ge-fnm/csm
 ```
+Or
+```sh
+npm install @ge-fnm/csm
+```
+### Usage
+This module uses the [@ge-fnm/action-object](https://github.com/GE-MDS-FNM-V2/action-object) 
+as an input parameter, so be warned that you are going to need to adhere to the latest standards
+for that object in order to use this module. For those specfications, visit that repository.
 
-TODO: The rest of this documentation
+This is an example of how this module may be used in a frontend environment
+```js
+import { executeCommunication } from '@ge-fnm/csm';
+import { v1, /* any other required classes, functions, or enums for creation. Check action-object repo. */ } from '@ge-fnm/action-object';
+
+const actionObject = v1.create({ /* This will house the required schema and information to create an Action Obejct*/ });
+const serializedActionObject = actionObject.serialize(); 
+const forwardingAddress = 'http://localhost:3001/remoteExecute'  // This is the address of the reverse proxy which can complete communications over serial, ssh, or http, should the frontend be unable to complete the given communication.
+
+executeCommunication(serializedActionObject)
+    .then(serializedActionResponse => {
+        /* Do something with your response object after radio communications */
+    })
+    .catch(error => {
+        /* This should be rare, but do something with your non-action-obejct Error */
+    })
+```
 
 ### Documentation
 Documentation can be found here - https://ge-mds-fnm-v2.github.io/csm/
