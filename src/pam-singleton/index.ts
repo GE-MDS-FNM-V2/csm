@@ -1,6 +1,9 @@
 import debug from 'debug'
 import { Executer } from '@ge-fnm/perform-action-module'
 
+/**
+ * Initializing the debug logger for 'ge-fnm:csm:pam-singleton'
+ */
 const log = debug('ge-fnm:csm:pam-singleton')
 
 /**
@@ -14,8 +17,14 @@ const log = debug('ge-fnm:csm:pam-singleton')
  * references to the same set of radio login sessions.
  */
 export class LocalExecuter {
+  /** Private, static instance of the Executer class. To be shared as a singleton. */
   private static instance: Executer
 
+  /**
+   * Public, static function for retrieving a reference to the singleton Executer instance.
+   * Creates the instance if it doesn't previously exist.
+   * @returns Executer instance
+   */
   public static getExecuter(): Executer {
     log('Retrieving PAM Executer singleton instance')
     if (!LocalExecuter.instance) {

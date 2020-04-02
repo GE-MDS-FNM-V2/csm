@@ -5,7 +5,11 @@ import { v1, CommunicationMethodV1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
 
+/**
+ * Initializing the debug logger for 'ge-fnm:csm'
+ */
 const log = debug('ge-fnm:csm')
+/** @hidden */
 const localExecuter = LocalExecuter.getExecuter()
 
 /**
@@ -21,6 +25,13 @@ const localExecuter = LocalExecuter.getExecuter()
  *    b. If it cannot, make a remote call to another CSM hosted at an address
  *       (forwardingAddress) and environment where it can perform the action
  * 3. Return the response object to the consumer of this module
+ * @param serializedActionObject String that adheres to a serialized Action Object schema as defined in this repo: https://github.com/GE-MDS-FNM-V2/action-object.
+ * This is a command object with all the information regarding a radio communication action.
+ * @param forwardingAddress String URI for a remote hosted version of this module. If you are in a frontend
+ * environment, then make sure to know where the Node, remote hosted CSM is in the case you are trying to execute communications
+ * that cannot be performed in a browser environment.
+ * @returns Serialized ActionObject with the original information, as well as the response/error from
+ * the communication attempt with the radio.
  */
 export const executeCommunication = (
   serializedActionObject: string,
@@ -89,6 +100,8 @@ export const executeCommunication = (
 }
 
 /**
+ * This is a private function as is.
+ *
  * There are two scenarios where communications with the radio are enabled
  * in the current runtime environment:
  *
@@ -96,6 +109,10 @@ export const executeCommunication = (
  *    enabled in Node)
  * 2. Developers have determined that there are protocols that a browser can
  *    safely communicate with a radio directly (ie, HTTP)
+ * @param protocol CommunicationMethodV1 string (as specified in this repo https://github.com/GE-MDS-FNM-V2/action-object).
+ * Examples might be HTTP, SERIAL, or SSH.
+ * @returns True if the protocol can be performed in the current JavaScript runtime environment, False if
+ * the protocol cannot be performed in the current JavaScript runtime environment.
  */
 const protocolEnabledInCurrentEnvironment = (protocol: CommunicationMethodV1): boolean => {
   return isNode || BROWSER_ENABLED_COMM_METHODS.includes(protocol)

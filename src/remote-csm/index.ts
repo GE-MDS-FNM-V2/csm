@@ -1,6 +1,9 @@
 import debug from 'debug'
 import axios from 'axios'
 
+/**
+ * Initializing the debug logger for 'ge-fnm:csm:remote-csm'
+ */
 const log = debug('ge-fnm:csm:remote-csm')
 
 /**
@@ -14,6 +17,9 @@ const log = debug('ge-fnm:csm:remote-csm')
  * in the future. There are some communication methods, such as serial, that
  * will always need to be executed from a Node environment. This reverse
  * proxy capability enables both of those scenarios.
+ * @param serializedActionObject Serialized Action Object string, as defined in this module  https://github.com/GE-MDS-FNM-V2/action-object.
+ * @param forwardingAddress URL string of location where a remote hosted CSM module is located.
+ * @returns Promise containing results from POST response to forwardingAddress
  */
 export const executeRemoteAction = (
   serializedActionObject: string,
