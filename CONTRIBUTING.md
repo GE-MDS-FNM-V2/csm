@@ -57,6 +57,7 @@ Its as simple as merging your feature branch into master. It will automatically 
 ### yarn scripts
  - `yarn start`: Run `yarn run build` in watch mode
  - `yarn run test:watch`: Run test suite in [interactive watch mode](http://facebook.github.io/jest/docs/cli.html#watch)
+ - `yarn run docs`: Run the [TypeDoc docuementation generator](https://typedoc.org/), excluding documentation of test files.
  - `yarn run test:prod`: Run linting and generate coverage
  - `yarn run build`: Generate bundles and typings, create docs
  - `yarn run lint`: Lints code
