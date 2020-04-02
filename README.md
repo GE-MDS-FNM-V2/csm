@@ -24,7 +24,7 @@ const actionObject = v1.create({ /* This will house the required schema and info
 const serializedActionObject = actionObject.serialize(); 
 const forwardingAddress = 'http://localhost:3001/remoteExecute'  // This is the address of the reverse proxy which can complete communications over serial, ssh, or http, should the frontend be unable to complete the given communication.
 
-executeCommunication(serializedActionObject)
+executeCommunication(serializedActionObject, forwardingAddress)
     .then(serializedActionResponse => {
         /* Do something with your response object after radio communications */
     })
