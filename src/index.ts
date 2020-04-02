@@ -1,7 +1,7 @@
 import debug from 'debug'
 import { isNode } from 'browser-or-node'
 import { LocalExecuter } from './pam-singleton'
-import { v1, CommunicationMethodV1, ActionObjec } from '@ge-fnm/action-object'
+import { v1, CommunicationMethodV1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
 
@@ -61,7 +61,7 @@ export const executeCommunication = (
           })
           .catch(err => {
             log('Remote Execution responded with following error,', err)
-            resolve(err)
+            reject(err)
           })
       } else {
         log(
