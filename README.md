@@ -34,7 +34,29 @@ executeCommunication(serializedActionObject, forwardingAddress)
 ```
 
 ### Documentation
-Documentation can be found here - https://ge-mds-fnm-v2.github.io/csm/
+Documentation for this project is not currently being generated and published. A good way to get
+some documentation is through a the [TypeDocs](https://typedoc.org/) plugin we have included.
+
+First clone this project:
+```sh
+git clone https://github.com/GE-MDS-FNM-V2/csm.git
+```
+
+Next go into the new directory and install all the dependencies
+```sh
+yarn
+```
+
+If there is already a `docs/` folder, run a quick
+```
+rm -rf docs/
+```
+
+Then run the following yarn script to generate a `docs/` folder with dynamic `.html` documenation generated
+from the code comments
+```sh
+yarn docs
+```
 
 ## Debugging
 We've added in optional logging to this module. You can enable it by setting the environment variable DEBUG:
