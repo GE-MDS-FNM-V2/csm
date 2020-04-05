@@ -288,10 +288,10 @@
   dependencies:
     find-up "^4.0.0"
 
-"@ge-fnm/action-object@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@ge-fnm/action-object/-/action-object-4.0.0.tgz#4a45b065b14ba450c24b2b1d279aced1fcdd6fa1"
-  integrity sha512-F5ne6B3GFmhhSP23Tk7h2ko9uByJ9iz/YH/idjcPwGz7h5qY4mm46mQ6OQQ7kZF7hqdeqIjf1FLkHyQ7TIiU6w==
+"@ge-fnm/action-object@^4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@ge-fnm/action-object/-/action-object-4.4.0.tgz#9c87376d2958d16e31a22c1857c264c2a3383531"
+  integrity sha512-Aa6ms8vhzKAFBk7FZ1vK6NCXkY9anJ7SDpU9q/v/CkQDqPKUDLOXN8AUP/jpNdC5rUAun3M1fzv2+jSs4IPJQg==
 
 "@ge-fnm/perform-action-module@^1.2.2":
   version "1.2.2"

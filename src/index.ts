@@ -1,9 +1,16 @@
 import debug from 'debug'
 import { isNode } from 'browser-or-node'
 import { LocalExecuter } from './pam-singleton'
-import { v1, CommunicationMethodV1 } from '@ge-fnm/action-object'
+import { v1, CommunicationMethodV1, GEErrors, ActionObjectV1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
+import {
+  serializeNoForwardingAddressError,
+  serializeRemoteCSMError,
+  serializePAMError,
+  packageError
+} from './errors'
+import { generateBlankActionObject } from './utils'
 
 /**
  * Initializing the debug logger for 'ge-fnm:csm'
@@ -44,9 +51,9 @@ export const executeCommunication = (
       ', and action object,',
       serializedActionObject
     )
-    let deserializedObj
+    let deserializedObj: ActionObjectV1
     try {
-      // If an invalid object string is passed in, reject the request
+      // Need to check that the string passed in follows the ActionObject schema
       deserializedObj = v1.deserialize(serializedActionObject)
     } catch (e) {
       log(
@@ -55,7 +62,15 @@ export const executeCommunication = (
         ':',
         e
       )
-      reject(e)
+      // If there is a problem deserializing, then we cannot assign anything to
+      // the error property of the object, which is where the consumers are going
+      // to be looking for an error. The way we are getting around this is creating
+      // a blank object, and then putting the error into that object. Also,
+      // it is expected that in a deserialization error, v1 should be throwing a
+      // GEError, so we are sticking to the same format as all the other errors.
+      let blankActionObject = generateBlankActionObject()
+      let serializedActionResponse = packageError(blankActionObject, e)
+      resolve(serializedActionResponse)
       return
     }
     let protocol = deserializedObj.information.commData.commMethod
@@ -72,13 +87,18 @@ export const executeCommunication = (
           })
           .catch(err => {
             log('Remote Execution responded with following error,', err)
-            reject(err)
+            const serializedActionResponse = serializeRemoteCSMError(deserializedObj, err)
+            resolve(serializedActionResponse)
           })
       } else {
         log(
           'Error calling remote execution, executeCommunication needs forwardingAddress for remote calls'
         )
-        reject(new Error(NEEDS_FORWARDING_ADDRESS_ERROR))
+        const serializedActionResponse = serializeNoForwardingAddressError(
+          deserializedObj,
+          NEEDS_FORWARDING_ADDRESS_ERROR
+        )
+        resolve(serializedActionResponse)
       }
     }
     // This block is only hit if the current environment supports
@@ -87,14 +107,10 @@ export const executeCommunication = (
       log('Executing Communication locally')
       localExecuter
         .execute(serializedActionObject)
-        .then(data => {
-          log('Local PAM Executer responded with following data,', data)
-          resolve(data)
+        .then(responseObj => {
+          resolve(responseObj)
         })
-        .catch(err => {
-          log('Local PAM Executer rejected with following error,', err)
-          reject(err)
-        })
+        .catch(err => {})
     }
   })
 }
