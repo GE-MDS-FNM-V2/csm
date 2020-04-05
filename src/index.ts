@@ -34,7 +34,7 @@ const localExecuter = LocalExecuter.getExecuter()
  * the communication attempt with the radio.
  */
 export const executeCommunication = (
-  serializedActionObject: string,
+  serializedActionObject: any,
   forwardingAddress?: string
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
