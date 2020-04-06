@@ -3,7 +3,7 @@ import {
   ActionTypeV1,
   CommunicationMethodV1,
   ProtocolV1,
-  ActionObjectInformationV1
+  ActionObjectInformationV1,
 } from '@ge-fnm/action-object'
 
 const REMOTE_PAM_SUCCESS_STRING = 'SUCCESS CALLED REMOTE PAM'
@@ -19,15 +19,15 @@ const objJson: ActionObjectInformationV1 = {
   actionType: ActionTypeV1.GET,
   commData: {
     commMethod: CommunicationMethodV1.HTTP,
-    protocol: ProtocolV1.JSONRPC
+    protocol: ProtocolV1.JSONRPC,
   },
   modifyingValue: 'test',
   path: ['hello', 'world'],
   response: {
     data: null,
-    error: null
+    error: null,
   },
-  uri: 'http://localhost:8000'
+  uri: 'http://localhost:8000',
 }
 
 const httpSerializedAction = v1.create(objJson).serialize()
@@ -42,25 +42,25 @@ describe('Communication Selector Test', () => {
     beforeEach(() => {
       jest.mock('./remote-csm', () => {
         return {
-          executeRemoteAction: () => Promise.resolve(REMOTE_PAM_SUCCESS_STRING)
+          executeRemoteAction: () => Promise.resolve(REMOTE_PAM_SUCCESS_STRING),
         }
       })
       jest.mock('@ge-fnm/perform-action-module', () => {
         return {
           Executer: jest.fn().mockImplementation(() => {
             return { execute: () => Promise.resolve(LOCAL_PAM_SUCCESS_STRING) }
-          })
+          }),
         }
       })
       jest.mock('browser-or-node', () => {
         return {
-          isNode: false
+          isNode: false,
         }
       })
       jest.mock('./constants', () => {
         return {
           BROWSER_ENABLED_COMM_METHODS: [CommunicationMethodV1.HTTP],
-          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK
+          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK,
         }
       })
 
@@ -78,10 +78,30 @@ describe('Communication Selector Test', () => {
         executeCommunication(serialSerializedAction, 'http://fakeapi.io/')
       ).resolves.toEqual(REMOTE_PAM_SUCCESS_STRING)
     })
-    it('Supported protocol calls local PAM and does not need a forwarding address', () => {
-      return expect(executeCommunication(httpSerializedAction)).resolves.toMatch(
-        LOCAL_PAM_SUCCESS_STRING
-      )
+    it('Supported protocol calls local PAM and does not need a forwarding address', async () => {
+      try {
+        const result = await executeCommunication(
+          v1.create({
+            version: 1,
+            actionType: ActionTypeV1.GET,
+            commData: {
+              commMethod: CommunicationMethodV1.HTTP,
+              protocol: ProtocolV1.JSONRPC,
+            },
+            modifyingValue: 'test',
+            path: ['hello', 'world'],
+            response: {
+              data: null,
+              error: null,
+            },
+            uri: 'http://localhost:8000',
+          })
+        )
+        expect(result).toEqual(LOCAL_PAM_SUCCESS_STRING)
+      } catch (error) {
+        expect(error).toEqual(null)
+      }
+      // return expect().resolves.toEqual({})
     })
     afterAll(() => {
       jest.resetModules()
@@ -94,25 +114,25 @@ describe('Communication Selector Test', () => {
     beforeEach(() => {
       jest.mock('./remote-csm', () => {
         return {
-          executeRemoteAction: () => Promise.reject(REMOTE_PAM_FAILURE_STRING)
+          executeRemoteAction: () => Promise.reject(REMOTE_PAM_FAILURE_STRING),
         }
       })
       jest.mock('@ge-fnm/perform-action-module', () => {
         return {
           Executer: jest.fn().mockImplementation(() => {
             return { execute: () => Promise.reject(LOCAL_PAM_FAILURE_STRING) }
-          })
+          }),
         }
       })
       jest.mock('browser-or-node', () => {
         return {
-          isNode: false
+          isNode: false,
         }
       })
       jest.mock('./constants', () => {
         return {
           BROWSER_ENABLED_COMM_METHODS: [CommunicationMethodV1.HTTP],
-          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK
+          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK,
         }
       })
 
@@ -125,10 +145,29 @@ describe('Communication Selector Test', () => {
         executeCommunication(serialSerializedAction, 'http://fakeapi.io/')
       ).rejects.toEqual(REMOTE_PAM_FAILURE_STRING)
     })
-    it('Supported protocol calls local PAM and does not need a forwarding address', () => {
-      return expect(executeCommunication(httpSerializedAction)).rejects.toMatch(
-        LOCAL_PAM_FAILURE_STRING
-      )
+    it('Supported protocol calls local PAM and does not need a forwarding address', async () => {
+      try {
+        const result = await executeCommunication(
+          v1.create({
+            version: 1,
+            actionType: ActionTypeV1.GET,
+            commData: {
+              commMethod: CommunicationMethodV1.HTTP,
+              protocol: ProtocolV1.JSONRPC,
+            },
+            modifyingValue: 'test',
+            path: ['hello', 'world'],
+            response: {
+              data: null,
+              error: null,
+            },
+            uri: 'http://localhost:8000',
+          })
+        )
+        expect(result).toEqual(null)
+      } catch (error) {
+        expect(error).toEqual(LOCAL_PAM_FAILURE_STRING)
+      }
     })
     it('Unsupported protocol rejects', () => {
       return expect(executeCommunication(serialSerializedAction)).rejects.toEqual(
@@ -146,25 +185,25 @@ describe('Communication Selector Test', () => {
     beforeEach(() => {
       jest.mock('browser-or-node', () => {
         return {
-          isNode: true
+          isNode: true,
         }
       })
       jest.mock('@ge-fnm/perform-action-module', () => {
         return {
           Executer: jest.fn().mockImplementation(() => {
             return { execute: () => Promise.resolve(LOCAL_PAM_SUCCESS_STRING) }
-          })
+          }),
         }
       })
       jest.mock('./remote-csm', () => {
         return {
-          executeRemoteAction: () => Promise.resolve(REMOTE_PAM_SUCCESS_STRING)
+          executeRemoteAction: () => Promise.resolve(REMOTE_PAM_SUCCESS_STRING),
         }
       })
       jest.mock('./constants', () => {
         return {
           BROWSER_ENABLED_COMM_METHODS: [CommunicationMethodV1.HTTP],
-          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK
+          NEEDS_FORWARDING_ADDRESS_ERROR: NEEDS_FORWARDING_ADDRESS_ERROR_MOCK,
         }
       })
 

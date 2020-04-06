@@ -46,7 +46,7 @@ export const executeCommunication = (
     )
     let deserializedObj
     try {
-      // If an invalid object string is passed in, reject the request
+      // If an invalid serialized action object is passed in, reject the request
       deserializedObj = v1.deserialize(serializedActionObject)
     } catch (e) {
       log(
@@ -66,11 +66,11 @@ export const executeCommunication = (
       log('Protocol,', protocol, ', is not supported by browser. Making remote execute call.')
       if (forwardingAddress) {
         executeRemoteAction(serializedActionObject, forwardingAddress)
-          .then(data => {
+          .then((data) => {
             log('Remote Execution responded with following data,', data)
             resolve(data)
           })
-          .catch(err => {
+          .catch((err) => {
             log('Remote Execution responded with following error,', err)
             reject(err)
           })
@@ -87,11 +87,11 @@ export const executeCommunication = (
       log('Executing Communication locally')
       localExecuter
         .execute(serializedActionObject)
-        .then(data => {
+        .then((data) => {
           log('Local PAM Executer responded with following data,', data)
           resolve(data)
         })
-        .catch(err => {
+        .catch((err) => {
           log('Local PAM Executer rejected with following error,', err)
           reject(err)
         })
