@@ -69,9 +69,16 @@ describe('Communication Selector Test', () => {
       executeCommunication = exComm
     })
 
-    it('Invalid serialized object responds with an error', () => {
-      let randomSerializedObject = JSON.stringify({ hello: 'world' })
-      return expect(executeCommunication(randomSerializedObject, 'fake.api')).rejects.toBeTruthy()
+    it('Invalid serialized object responds with an error', async () => {
+      // CSM execution responsible for creating and returning a serialized ActionObject
+      try {
+        let randomSerializedObject = JSON.stringify({ hello: 'world' })
+        let _ = await executeCommunication(randomSerializedObject, 'fake.api')
+        fail('Invalid serialized object should respond with an error')
+      } catch (responseObj) {
+        let deserializedObj = v1.deserialize(responseObj)
+        expect(deserializedObj.information.response?.error).toBeDefined()
+      }
     })
 
     it('Unsupported protocol calls remote executor', () => {
