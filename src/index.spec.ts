@@ -3,7 +3,8 @@ import {
   ActionTypeV1,
   CommunicationMethodV1,
   ProtocolV1,
-  ActionObjectInformationV1
+  ActionObjectInformationV1,
+  GEErrors
 } from '@ge-fnm/action-object'
 
 const REMOTE_PAM_SUCCESS_STRING = 'SUCCESS CALLED REMOTE PAM'
@@ -130,10 +131,16 @@ describe('Communication Selector Test', () => {
         LOCAL_PAM_FAILURE_STRING
       )
     })
-    it('Unsupported protocol rejects', () => {
-      return expect(executeCommunication(serialSerializedAction)).rejects.toEqual(
-        new Error(NEEDS_FORWARDING_ADDRESS_ERROR_MOCK)
-      )
+    it('Unsupported protocol rejects', async () => {
+      try {
+        const _ = await executeCommunication(serialSerializedAction)
+        fail('Unsupported protocol should have failed without forwarding address')
+      } catch (erroObj) {
+        const deserializedObj = v1.deserialize(erroObj)
+        expect(deserializedObj.information.response?.error.status).toEqual(
+          GEErrors.GECSMErrorCodes.NO_FORWARDING_ADDRESS
+        )
+      }
     })
     afterAll(() => {
       jest.resetModules()

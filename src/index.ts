@@ -1,15 +1,10 @@
 import debug from 'debug'
 import { isNode } from 'browser-or-node'
 import { LocalExecuter } from './pam-singleton'
-import { v1, CommunicationMethodV1, GEErrors, ActionObjectV1 } from '@ge-fnm/action-object'
+import { v1, CommunicationMethodV1, ActionObjectV1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
-import {
-  serializeNoForwardingAddressError,
-  serializeRemoteCSMError,
-  serializePAMError,
-  packageError
-} from './errors'
+import { serializeNoForwardingAddressError, serializeError } from './errors'
 import { generateBlankActionObject } from './utils'
 
 /**
@@ -69,37 +64,39 @@ export const executeCommunication = (
       // it is expected that in a deserialization error, v1 should be throwing a
       // GEError, so we are sticking to the same format as all the other errors.
       let blankActionObject = generateBlankActionObject()
-      let serializedActionResponse = packageError(blankActionObject, e)
-      resolve(serializedActionResponse)
+      let serializedActionResponse = serializeError(blankActionObject, e)
+      reject(serializedActionResponse)
       return
     }
     let protocol = deserializedObj.information.commData.commMethod
     // If the procol specified in the action object cannot be performed in the
     // current runtime environment, a remote hosted CSM needs to be used to
     // reach the radio
-    if (!protocolEnabledInCurrentEnvironment(protocol)) {
+    if (!protocolEnabledInCurrentEnvironment(protocol) && forwardingAddress) {
       log('Protocol,', protocol, ', is not supported by browser. Making remote execute call.')
-      if (forwardingAddress) {
-        executeRemoteAction(serializedActionObject, forwardingAddress)
-          .then(data => {
-            log('Remote Execution responded with following data,', data)
-            resolve(data)
-          })
-          .catch(err => {
-            log('Remote Execution responded with following error,', err)
-            const serializedActionResponse = serializeRemoteCSMError(deserializedObj, err)
-            resolve(serializedActionResponse)
-          })
-      } else {
-        log(
-          'Error calling remote execution, executeCommunication needs forwardingAddress for remote calls'
-        )
-        const serializedActionResponse = serializeNoForwardingAddressError(
-          deserializedObj,
-          NEEDS_FORWARDING_ADDRESS_ERROR
-        )
-        resolve(serializedActionResponse)
-      }
+      executeRemoteAction(serializedActionObject, forwardingAddress)
+        .then(responseActionObject => {
+          log('Remote Execution responded with following data,', responseActionObject)
+          resolve(responseActionObject)
+        })
+        .catch(errorActionObject => {
+          log('Remote Execution responded with following error,', errorActionObject)
+          reject(errorActionObject)
+        })
+    }
+    // If there is no forwardingAddress provided, then the CSM needs to return the
+    // proper error informing the consumer
+    else if (!protocolEnabledInCurrentEnvironment(protocol) && !forwardingAddress) {
+      log(
+        'Error: Protocol,',
+        protocol,
+        ', is not supported by browser and no forwarding address has been provided'
+      )
+      const serializedActionResponse = serializeNoForwardingAddressError(
+        deserializedObj,
+        NEEDS_FORWARDING_ADDRESS_ERROR
+      )
+      reject(serializedActionResponse)
     }
     // This block is only hit if the current environment supports
     // communications with the radio
@@ -110,7 +107,13 @@ export const executeCommunication = (
         .then(responseObj => {
           resolve(responseObj)
         })
-        .catch(err => {})
+        .catch(errorObj => {
+          // In this case we are calling PAM, and error handling beyond
+          // this point should be covered by that module. If there is a
+          // rejection it should be handled graciously by that module and
+          // return an ActonObject with an appropriate GEError.
+          reject(errorObj)
+        })
     }
   })
 }
