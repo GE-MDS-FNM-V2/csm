@@ -4,6 +4,7 @@ import {
   CommunicationMethodV1,
   ProtocolV1,
   ActionObjectInformationV1,
+  GEErrors,
 } from '@ge-fnm/action-object'
 
 const REMOTE_PAM_SUCCESS_STRING = 'SUCCESS CALLED REMOTE PAM'
@@ -68,9 +69,16 @@ describe('Communication Selector Test', () => {
       executeCommunication = exComm
     })
 
-    it('Invalid serialized object responds with an error', () => {
-      let randomSerializedObject = JSON.stringify({ hello: 'world' })
-      return expect(executeCommunication(randomSerializedObject, 'fake.api')).rejects.toBeTruthy()
+    it('Invalid serialized object responds with an error', async () => {
+      // CSM execution responsible for creating and returning a serialized ActionObject
+      try {
+        let randomSerializedObject = JSON.stringify({ hello: 'world' })
+        let _ = await executeCommunication(randomSerializedObject, 'fake.api')
+        fail('Invalid serialized object should respond with an error')
+      } catch (responseObj) {
+        let deserializedObj = v1.deserialize(responseObj)
+        expect(deserializedObj.information.response?.error).toBeDefined()
+      }
     })
 
     it('Unsupported protocol calls remote executor', () => {
@@ -169,10 +177,16 @@ describe('Communication Selector Test', () => {
         expect(error).toEqual(LOCAL_PAM_FAILURE_STRING)
       }
     })
-    it('Unsupported protocol rejects', () => {
-      return expect(executeCommunication(serialSerializedAction)).rejects.toEqual(
-        new Error(NEEDS_FORWARDING_ADDRESS_ERROR_MOCK)
-      )
+    it('Unsupported protocol rejects', async () => {
+      try {
+        const _ = await executeCommunication(serialSerializedAction)
+        fail('Unsupported protocol should have failed without forwarding address')
+      } catch (erroObj) {
+        const deserializedObj = v1.deserialize(erroObj)
+        expect(deserializedObj.information.response?.error.status).toEqual(
+          GEErrors.GECSMErrorCodes.NO_FORWARDING_ADDRESS
+        )
+      }
     })
     afterAll(() => {
       jest.resetModules()

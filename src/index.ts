@@ -1,9 +1,11 @@
 import debug from 'debug'
 import { isNode } from 'browser-or-node'
 import { LocalExecuter } from './pam-singleton'
-import { v1, CommunicationMethodV1 } from '@ge-fnm/action-object'
+import { v1, CommunicationMethodV1, ActionObjectV1 } from '@ge-fnm/action-object'
 import { executeRemoteAction } from './remote-csm'
 import { BROWSER_ENABLED_COMM_METHODS, NEEDS_FORWARDING_ADDRESS_ERROR } from './constants'
+import { serializeNoForwardingAddressError, serializeError } from './errors'
+import { generateBlankActionObject } from './utils'
 
 /**
  * Initializing the debug logger for 'ge-fnm:csm'
@@ -36,7 +38,7 @@ const localExecuter = LocalExecuter.getExecuter()
 export const executeCommunication = (
   serializedActionObject: any,
   forwardingAddress?: string
-): Promise<string> => {
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     log(
       'CSM communication execution starting with forwarding address,',
@@ -44,7 +46,7 @@ export const executeCommunication = (
       ', and action object,',
       serializedActionObject
     )
-    let deserializedObj
+    let deserializedObj: ActionObjectV1
     try {
       // If an invalid serialized action object is passed in, reject the request
       deserializedObj = v1.deserialize(serializedActionObject)
@@ -55,31 +57,46 @@ export const executeCommunication = (
         ':',
         e
       )
-      reject(e)
+      // If there is a problem deserializing, then we cannot assign anything to
+      // the error property of the object, which is where the consumers are going
+      // to be looking for an error. The way we are getting around this is creating
+      // a blank object, and then putting the error into that object. Also,
+      // it is expected that in a deserialization error, v1 should be throwing a
+      // GEError, so we are sticking to the same format as all the other errors.
+      let blankActionObject = generateBlankActionObject()
+      let serializedActionResponse = serializeError(blankActionObject, e)
+      reject(serializedActionResponse)
       return
     }
     let protocol = deserializedObj.information.commData.commMethod
     // If the procol specified in the action object cannot be performed in the
     // current runtime environment, a remote hosted CSM needs to be used to
     // reach the radio
-    if (!protocolEnabledInCurrentEnvironment(protocol)) {
+    if (!protocolEnabledInCurrentEnvironment(protocol) && forwardingAddress) {
       log('Protocol,', protocol, ', is not supported by browser. Making remote execute call.')
-      if (forwardingAddress) {
-        executeRemoteAction(serializedActionObject, forwardingAddress)
-          .then((data) => {
-            log('Remote Execution responded with following data,', data)
-            resolve(data)
-          })
-          .catch((err) => {
-            log('Remote Execution responded with following error,', err)
-            reject(err)
-          })
-      } else {
-        log(
-          'Error calling remote execution, executeCommunication needs forwardingAddress for remote calls'
-        )
-        reject(new Error(NEEDS_FORWARDING_ADDRESS_ERROR))
-      }
+      executeRemoteAction(serializedActionObject, forwardingAddress)
+        .then((responseActionObject) => {
+          log('Remote Execution responded with following data,', responseActionObject)
+          resolve(responseActionObject)
+        })
+        .catch((errorActionObject) => {
+          log('Remote Execution responded with following error,', errorActionObject)
+          reject(errorActionObject)
+        })
+    }
+    // If there is no forwardingAddress provided, then the CSM needs to return the
+    // proper error informing the consumer
+    else if (!protocolEnabledInCurrentEnvironment(protocol) && !forwardingAddress) {
+      log(
+        'Error: Protocol,',
+        protocol,
+        ', is not supported by browser and no forwarding address has been provided'
+      )
+      const serializedActionResponse = serializeNoForwardingAddressError(
+        deserializedObj,
+        NEEDS_FORWARDING_ADDRESS_ERROR
+      )
+      reject(serializedActionResponse)
     }
     // This block is only hit if the current environment supports
     // communications with the radio
@@ -87,13 +104,15 @@ export const executeCommunication = (
       log('Executing Communication locally')
       localExecuter
         .execute(serializedActionObject)
-        .then((data) => {
-          log('Local PAM Executer responded with following data,', data)
-          resolve(data)
+        .then((responseObj) => {
+          resolve(responseObj)
         })
-        .catch((err) => {
-          log('Local PAM Executer rejected with following error,', err)
-          reject(err)
+        .catch((errorObj) => {
+          // In this case we are calling PAM, and error handling beyond
+          // this point should be covered by that module. If there is a
+          // rejection it should be handled graciously by that module and
+          // return an ActonObject with an appropriate GEError.
+          reject(errorObj)
         })
     }
   })

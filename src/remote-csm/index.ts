@@ -1,5 +1,7 @@
 import debug from 'debug'
 import axios from 'axios'
+import { v1 } from '@ge-fnm/action-object'
+import { serializeRemoteCSMError } from '../errors'
 
 /**
  * Initializing the debug logger for 'ge-fnm:csm:remote-csm'
@@ -22,9 +24,9 @@ const log = debug('ge-fnm:csm:remote-csm')
  * @returns Promise containing results from POST response to forwardingAddress
  */
 export const executeRemoteAction = (
-  serializedActionObject: string,
+  serializedActionObject: any,
   forwardingAddress: string
-): Promise<string> => {
+): Promise<any> => {
   log(
     'Remote executing action at',
     forwardingAddress,
@@ -35,13 +37,29 @@ export const executeRemoteAction = (
   return new Promise((resolve, reject) => {
     axios
       .post(forwardingAddress, { serializedAction: serializedActionObject })
-      .then(res => {
+      .then((res) => {
+        // HAPPY PATH: will have a serialized Action Object attached to
+        // the .data value in the response
         log('Remote execute responded with following data', res.data)
         resolve(res.data)
       })
-      .catch(err => {
-        log('Remote execute failed with following error,', err)
-        reject(err)
+      .catch((err) => {
+        let errorResponse = err.response.data
+        log('Remote execute failed with following data,', errorResponse)
+        try {
+          // If there was an action object in the error response, there is no need to create a new one.
+          // We know this is an ActionObejct if v1.deserialize succeeds.
+          let _ = v1.deserialize(errorResponse)
+          reject(errorResponse)
+        } catch (e) {
+          // Else, there is no action object (meaning that there needs to be an action object created)
+          // This also means that this is most likely an error with not reaching the remote CSM.
+          let errorObject = serializeRemoteCSMError(
+            v1.deserialize(serializedActionObject),
+            errorResponse
+          )
+          reject(errorObject)
+        }
       })
   })
 }
