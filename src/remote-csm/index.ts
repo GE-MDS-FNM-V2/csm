@@ -2,6 +2,7 @@ import debug from 'debug'
 import axios from 'axios'
 import { v1 } from '@ge-fnm/action-object'
 import { serializeRemoteCSMError } from '../errors'
+import { GECSMError } from '@ge-fnm/action-object/dist/types/GEError'
 
 /**
  * Initializing the debug logger for 'ge-fnm:csm:remote-csm'
@@ -44,20 +45,26 @@ export const executeRemoteAction = (
         resolve(res.data)
       })
       .catch((err) => {
-        let errorResponse = err.response.data
-        log('Remote execute failed with following data,', errorResponse)
-        try {
-          // If there was an action object in the error response, there is no need to create a new one.
-          // We know this is an ActionObejct if v1.deserialize succeeds.
-          let _ = v1.deserialize(errorResponse)
-          reject(errorResponse)
-        } catch (e) {
-          // Else, there is no action object (meaning that there needs to be an action object created)
-          // This also means that this is most likely an error with not reaching the remote CSM.
-          let errorObject = serializeRemoteCSMError(
-            v1.deserialize(serializedActionObject),
-            errorResponse
-          )
+        // This is an action object with errors on the response field
+        if (err.response) {
+          let errorResponse = err.response.data
+          log('Remote execute failed with following data,', errorResponse)
+          try {
+            // If there was an action object in the error response, there is no need to create a new one.
+            // We know this is an ActionObejct if v1.deserialize succeeds.
+            let _ = v1.deserialize(errorResponse)
+            reject(errorResponse)
+          } catch (e) {
+            // Else, there is no action object (meaning that there needs to be an action object created)
+            // This also means that this is most likely an error with not reaching the remote CSM.
+            let errorObject = serializeRemoteCSMError(
+              v1.deserialize(serializedActionObject),
+              errorResponse
+            )
+            reject(errorObject)
+          }
+        } else {
+          let errorObject = serializeRemoteCSMError(v1.deserialize(serializedActionObject), err)
           reject(errorObject)
         }
       })
