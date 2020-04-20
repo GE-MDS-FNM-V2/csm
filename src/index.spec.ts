@@ -41,6 +41,13 @@ describe('Communication Selector Test', () => {
     // Run before every single it() block within this describe block. Using
     // this as a means of manipulating mock responses from imported packages.
     beforeEach(() => {
+      console.log(`  _    _ ______ _      _      ____    _____  ______ __  __  ____  
+      | |  | |  ____| |    | |    / __ \  |  __ \|  ____|  \/  |/ __ \ 
+      | |__| | |__  | |    | |   | |  | | | |  | | |__  | \  / | |  | |
+      |  __  |  __| | |    | |   | |  | | | |  | |  __| | |\/| | |  | |
+      | |  | | |____| |____| |___| |__| | | |__| | |____| |  | | |__| |
+      |_|  |_|______|______|______\____/  |_____/|______|_|  |_|\____/ 
+                                                                       `)
       jest.mock('./remote-csm', () => {
         return {
           executeRemoteAction: () => Promise.resolve(REMOTE_PAM_SUCCESS_STRING),
